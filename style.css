@@ -1,0 +1,38 @@
+
+body{
+background-size: cover; 
+background-image:url(./assets/img/blueSky.jpg);
+background-position: center;
+min-height: 100vh;
+}
+
+.btn {
+    background: whitesmoke;
+}
+
+.svgLoupe{
+    width: 30px;
+}
+
+.btn {
+    border: solid 1px black;
+}
+
+.cityName {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.row {
+    display: flex;
+    justify-content: center;
+}
+
+.tempAct {
+    font-size: 35px;
+    font-weight: bold;
+}
+
+.condition {
+    font-size: 20px;
+}

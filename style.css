@@ -36,3 +36,16 @@ min-height: 100vh;
 .condition {
     font-size: 20px;
 }
+
+div.hourByHour {
+    overflow: auto;
+    white-space: nowrap;
+    text-align: center;
+ }
+
+ div.hourByHour .weather-by-hour {
+    display: inline-block;
+    text-align: center;
+    padding: 14px;
+    color: whitesmoke;
+ }

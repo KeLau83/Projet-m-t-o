@@ -6,6 +6,10 @@ background-position: center;
 min-height: 100vh;
 }
 
+.row {
+    padding: 5px;
+}
+
 .btn {
     background: whitesmoke;
 }
@@ -49,3 +53,14 @@ div.hourByHour {
     padding: 14px;
     color: whitesmoke;
  }
+ 
+ .search{
+     justify-content: flex-end;
+ }
+ 
+ .weather-next-days {
+     display: flex;
+     justify-content: space-between;
+     border:1px black;
+ }
+ 

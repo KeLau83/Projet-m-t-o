@@ -4,12 +4,15 @@ const $tempAct = document.querySelector(".tempAct");
 const $cityChoose = document.querySelector(".cityChoose");
 const $condition = document.querySelector(".condition");
 const $body = document.querySelector("body");
-let city = "toulon"
+let city = "paris"
 let conditionAct;
 let hourAct;
 let hourIcon;
 let pathHour ="";
 let hourTemp;
+let skyTint;
+let $city;
+
 
 const divHour = function () {
     const div = document.createElement('div');
@@ -18,11 +21,17 @@ const divHour = function () {
     document.querySelector(".hourByHour").appendChild(div);
 }
 const background = function () {
-    if ( conditionAct == "Ensoleillé") {
-        $body.style.backgroundImage = `url(./assets/img/blueSky.jpg)`
-    }if( conditionAct == "Développement nuageux") {
+    if ( skyTint == "Nuit") {
         $body.style.backgroundImage = `url(./assets/img/petitNuage.png)`
+        
+    }else {
+        $body.style.backgroundImage = `url(./assets/img/blueSky.jpg)`
     }
+}
+
+const storageCity = function (event) {
+    let $cityWrite = $cityChoose.value
+    localStorage.setItem($city,$cityWrite)
 }
 
 const nextHours = function (response) {
@@ -48,7 +57,24 @@ const nextHours = function (response) {
     }
 }
 
+const nextDays = function (response) {
+    for (let i = 0; i < 4; i++) {
+        let futurDay = "fcst_day_" + i;
+        let day = response[futurDay].day_short;
+        let tmin = response[futurDay].tmin;
+        let tmax = response[futurDay].tmax;
+        let litleIcon = response[futurDay].icon;
+
+        const div = document.createElement('div');
+        div.className = "weather-next-days";
+        div.innerHTML = `<p>` + day + `</p> <p>` +tmin + `/` + tmax + `°C</p> <img src="`+ litleIcon + `">`;
+        document.querySelector(".nextDays").appendChild(div);
+    }
+}
 function main () {
+    // if ( localStorage.length != 0 ) {
+    //     city = localStorage.getItem($city)
+    // }
      if ($cityChoose.value != "") {
         city = $cityChoose.value;
     }
@@ -62,10 +88,14 @@ function main () {
             $tempAct.innerHTML = response.current_condition.tmp + "°C"
             $logoTemp.innerHTML = `<img src=` + response.current_condition.icon_big + `>`
             conditionAct =  response.current_condition.condition
+            skyTint = conditionAct.substr(0,4 )
             $condition.innerHTML = conditionAct
             $cityChoose.value = "";
             background()
             nextHours(response)
+            nextDays(response)
+            
+            
             
         })
         .catch(function () {
@@ -74,6 +104,7 @@ function main () {
 }
 
 $cityChoose.addEventListener('change', main);
+$cityChoose.addEventListener('change', storageCity);
 
 
 

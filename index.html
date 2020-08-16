@@ -13,7 +13,9 @@
 
 <body>
     <div class="container">
-
+        <div class="row search">
+            <input type="text " class="cityChoose" placeholder="Choisisez une ville">
+        </div>
         <div class="row mainInfo">
             <div class="col ">
                 <div class="row cityName"></div>
@@ -28,11 +30,13 @@
             </div>
             <div class="col-2 col-md-3"></div>
         </div>
-        <div class="row search">
-            <input type="text " class="cityChoose" placeholder="Choisisez une ville">
-            <button onclick="main()" type="button" class="btn "><img class="svgLoupe"
-                    src="./assets/img/loupe.svg"></button>
+        <div class="row">
+            <div class="col-2 col-md-3"></div>
+            <div class="col-8 col-md-6 nextDays">
+            </div>
+            <div class="col-2 col-md-3"></div>
         </div>
+
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"

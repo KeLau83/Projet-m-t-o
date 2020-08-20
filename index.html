@@ -12,13 +12,34 @@
 </head>
 
 <body>
-    <div class="container">
-        <div class="row search">
-            <input type="text " class="cityChoose" placeholder="Choisisez une ville">
+    <nav class="navbar navbar-expand-md navbar-light ">
+        <a class="navbar-brand ok" href="#">France météo</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+            aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item  dropdown">
+                    <a class="nav-link dropdown-toggle mr-sm-2 " href="#" id="navbarDropdownMenuLink"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Favoris
+                    </a>
+                    <div class="dropdown-menu favoris" aria-labelledby="navbarDropdownMenuLink">
+                    </div>
+                </li>
+            </ul>
+            <div class="btnNavFav">
+            </div>
+            <form class="form-inline ">
+                <input type="search" class="cityChoose form-control mr-sm-2" placeholder="Choisisez une ville">
+            </form>
         </div>
+    </nav>
+    <div class="container body-container">
         <div class="row mainInfo">
             <div class="col ">
-                <div class="row cityName"></div>
+                <div class="row bold"></div>
                 <div class="row logoTemp"></div>
                 <div class="row tempAct"></div>
                 <div class="row condition"></div>
@@ -36,7 +57,22 @@
             </div>
             <div class="col-2 col-md-3"></div>
         </div>
-
+        <div class="row">
+            <div class="col-2 col-md-3"></div>
+            <div type="button" onclick="showInfo()" class="col-8 col-md-6 bold sup-info sup-info_disable">Infos
+                supplémentaires
+                <div class="lineInfo row">
+                    <div class="humidity info col "></div>
+                    <div class="windSpeed info col "></div>
+                </div>
+                <div class="lineInfo row ">
+                    <div class="sunRise info col "></div>
+                    <div class="sunSet info col "></div>
+                </div>
+            </div>
+            <div class="col-2 col-md-3"></div>
+        </div>
+    </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"

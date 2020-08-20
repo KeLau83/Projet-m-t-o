@@ -1,13 +1,49 @@
 
-body{
+body {
 background-size: cover; 
-background-image:url(./assets/img/blueSky.jpg);
 background-position: center;
 min-height: 100vh;
 }
 
-.row {
+nav {
+    margin-bottom: 60px;
+}
+
+.navbar-light .navbar-toggler{
+    background: white;
+}
+.navbar-collapse{
+    justify-content: space-between;
+}
+.fav {
+    width: 45px;
+    cursor: pointer;
+}
+
+.img:hover {
+    font-size: 25px;
+}
+
+.dropdown-toggle{
+    font-size: bold;
+}
+.navbar {
+    background: rgba(245,245,245,0.6);
+}
+
+.navbar-light .navbar-nav .nav-link{
+    border-radius: .25rem;
     padding: 5px;
+    color: black;
+}
+
+.navbar-brand {
+    background:white;
+    border-radius: .25rem;
+    padding: 5px;
+}
+.body-container {
+    background: rgba(245,245,245,0.6) ;
 }
 
 .btn {
@@ -22,16 +58,26 @@ min-height: 100vh;
     border: solid 1px black;
 }
 
-.cityName {
-    font-size: 30px;
+.bold {
+    font-size: 15px;
     font-weight: bold;
+    text-align: center;
 }
+
+.bold:first-child {
+    font-size: 30px;
+}
+
 
 .row {
     display: flex;
     justify-content: center;
+    padding: 8px;
 }
 
+.cityChoose {
+    height: 40px;
+}
 .tempAct {
     font-size: 35px;
     font-weight: bold;
@@ -51,16 +97,73 @@ div.hourByHour {
     display: inline-block;
     text-align: center;
     padding: 14px;
-    color: whitesmoke;
  }
  
  .search{
      justify-content: flex-end;
+     padding-bottom: 15px;
  }
  
  .weather-next-days {
      display: flex;
      justify-content: space-between;
-     border:1px black;
+     border-top: solid rgba(0, 0, 0, 0.3) 0.5px;
+     padding: 10px;
+ }
+ .weather-next-days:last-child {
+     border-bottom: solid rgba(0, 0, 0, 0.3) 0.5px ;
+ }
+
+.btn-addFav {
+    margin-right: 10px;
+    border: none;
+}
+ .lineInfo{
+     display: none;
+     justify-content: space-between;
+ }
+
+ .info:nth-child(2n+1){
+     justify-content: start;
+ }
+ .info:nth-child(2n){
+     justify-content: end;
+ }
+ .active {
+    display: flex;
+    font-size: 15px;
+    font-weight: normal;
+ }
+
+ .sup-info {
+     padding: 8px;
+ }
+
+ .sup-info_disable{
+    border: solid rgba(0, 0, 0, 0.3) 2px;
+ }
+ .sup-info_disable:hover {
+     background: rgba(0, 0, 0, 0.3);
+     color: whitesmoke;
  }
  
+ .btn-outline-secondary {
+     color: black;
+ }
+ ::-webkit-scrollbar {
+    width: 7px;
+}
+
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+}
+
+.displayNone {
+    display: none;
+}

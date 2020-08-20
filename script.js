@@ -80,7 +80,6 @@ const addFav = function () {
     }
     localStorage.setItem('datFav', favoris)
     document.querySelector(".dropdown-menu").innerHTML = "";
-
     writeTitle()
     writeFav()
     addFunctionNewFav()

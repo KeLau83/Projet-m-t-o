@@ -10,23 +10,11 @@ const $infoSup = document.querySelector(".sup-info");
 const $favoris = document.querySelector(".favoris");
 const $btnFav = document.querySelectorAll(".btn-fav");
 let city = "Paris"
-let conditionAct;
-let hourAct;
-let hourIcon;
-let pathHour = "";
-let hourTemp;
-let skyTint;
-let $city;
 let favoris = [];
-let fav;
 
 const capitalize = (string) => {
     if (typeof string !== 'string') return ''
     return string.charAt(0).toUpperCase() + string.slice(1)
-}
-
-const displayFav = function () {
-    document.querySelector("#navbarDropdownMenuLink").classList.add("displayNone")
 }
 
 const writeTitle = function () {
@@ -49,24 +37,23 @@ const writeTitle = function () {
     }
 }
 
-const newPage = function () {
-    city = event.target.textContent;
-    main()
+const displayFav = function () {
+    document.querySelector("#navbarDropdownMenuLink").classList.add("displayNone")
 }
 
 const writeFav = function () {
     document.querySelector(".dropdown-menu").innerHTML = "";
-    fav = localStorage.getItem('fav');
-    if (fav == "") {
+    let datFav = localStorage.getItem('datFav');
+    if (datFav == "") {
         favoris = []
     } else {
-        favoris = fav.split(',');
+        favoris = datFav.split(',');
     }
     for (favori of favoris) {
         if (favori != "") {
             const a = document.createElement('a');
             a.className = "dropdown-item";
-            a.href = "#"
+            a.href = "#";
             a.innerHTML = favori;
             document.querySelector(".dropdown-menu").appendChild(a);
         }
@@ -77,23 +64,21 @@ const writeFav = function () {
 const addFav = function () {
     let cityAdd = $cityName.textContent;
     if (localStorage.length != 0) {
-        fav = localStorage.getItem('fav');
-        if (fav == "") {
+        let datFav = localStorage.getItem('datFav');
+        if (datFav == "") {
             favoris = []
         } else {
-            favoris = fav.split(',');
+            favoris = datFav.split(',');
         }
 
     }
-    for (favori of favoris) {
-        if (favori == cityAdd) {
-            cityAdd = false
-        }
-    }
-    if (cityAdd != false || cityAdd != "") {
+
+    const bAlreadyFavorite = favoris.indexOf(cityAdd) > -1;
+
+    if (!bAlreadyFavorite && cityAdd != "") {
         favoris.push(cityAdd);
     }
-    localStorage.setItem('fav', favoris)
+    localStorage.setItem('datFav', favoris)
     document.querySelector(".dropdown-menu").innerHTML = "";
 
     writeTitle()
@@ -109,19 +94,14 @@ const removeFav = function () {
             favoris.splice(favoris.indexOf(favori),1)
         }
     }
-    localStorage.setItem('fav', favoris)
+    localStorage.setItem('datFav', favoris)
     writeTitle()
     writeFav()
     addFunctionNewFav()
 }
 
-const divHour = function () {
-    const div = document.createElement('div');
-    div.className = "weather-by-hour";
-    div.innerHTML = `<p>` + pathHour + `</p> <img src="` + hourIcon + `"><p>` + hourTemp + ` °C</p>`;
-    document.querySelector(".hourByHour").appendChild(div);
-}
-const background = function () {
+
+const background = function (skyTint) {
     if (skyTint == "Nuit") {
         $body.style.backgroundImage = `url(./assets/img/blackSky.jpg)`
 
@@ -137,26 +117,15 @@ const infoSup = function (response) {
     document.querySelector(".sunSet").innerHTML = "et se couchera à " + response.city_info.sunset;
 }
 
-const showInfo = function () {
-    $infoSup.classList.remove("sup-info_disable");
-    const $lineInfo = document.querySelectorAll(".lineInfo");
-    for (div of $lineInfo) {
-        div.classList.remove("displayNone")
-        div.classList.add("active")
-    }
+const divHour = function (pathHour, hourIcon, hourTemp) {
+    const div = document.createElement('div');
+    div.className = "weather-by-hour";
+    div.innerHTML = `<p>` + pathHour + `</p> <img src="` + hourIcon + `"><p>` + hourTemp + ` °C</p>`;
+    document.querySelector(".hourByHour").appendChild(div);
 }
 
-const hideInfo = function () {
-    $infoSup.classList.add("sup-info_disable");
-    const $lineInfo = document.querySelectorAll(".lineInfo");
-    for (div of $lineInfo) {
-        div.classList.add("displayNone")
-    }
-}
-
-const nextHours = function (response) {
+const nextHours = function (response ,hourAct ) {
     let i = 0;
-    let j = 0;
     let iHour = "";
 
     while (iHour != hourAct) {
@@ -169,26 +138,16 @@ const nextHours = function (response) {
     }
 
     $divHourByHour.innerHTML = "";
-
-    while (i < 24) {
-        pathHour = i + "H00"
-        hourIcon = response.fcst_day_0.hourly_data[pathHour].ICON;
-        hourTemp = response.fcst_day_0.hourly_data[pathHour].TMP2m;
-        divHour()
-        i += 1;
-        j += 1;
-    }
-
-    if (j < 24) {
-        i = 0;
-        while (j < 24) {
-            pathHour = i + "H00"
-            hourIcon = response.fcst_day_1.hourly_data[pathHour].ICON;
-            hourTemp = response.fcst_day_1.hourly_data[pathHour].TMP2m;
-            divHour()
-            i += 1
-            j += 1
+    let DayForTheHours = "fcst_day_0" ;
+    for (let  j = 0; j < 24;i++,j++) {
+        if (i == 24) {
+            i = 0;
+            DayForTheHours = "fcst_day_1"; 
         }
+        const pathHour = i + "H00"
+        const hourIcon = response[DayForTheHours].hourly_data[pathHour].ICON;
+        const hourTemp = response[DayForTheHours].hourly_data[pathHour].TMP2m;
+        divHour(pathHour, hourIcon, hourTemp)
     }
 }
 
@@ -210,12 +169,34 @@ const nextDays = function (response) {
     }
 }
 
+const newPage = function () {
+    city = event.target.textContent;
+    main()
+}
+
 const addFunctionNewFav = function () {
     const $dropddownFav = document.querySelectorAll(".dropdown-item")
     for (item of $dropddownFav) {
         item.addEventListener("click", newPage)
     }
 
+}
+
+const showInfo = function () {
+    $infoSup.classList.remove("sup-info_disable");
+    const $lineInfo = document.querySelectorAll(".lineInfo");
+    for (div of $lineInfo) {
+        div.classList.remove("displayNone")
+        div.classList.add("active")
+    }
+}
+
+const hideInfo = function () {
+    $infoSup.classList.add("sup-info_disable");
+    const $lineInfo = document.querySelectorAll(".lineInfo");
+    for (div of $lineInfo) {
+        div.classList.add("displayNone")
+    }
 }
 
 function main() {
@@ -230,16 +211,15 @@ function main() {
             hourAct = response.current_condition.hour
             $tempAct.innerHTML = `${response.current_condition.tmp}°C`
             $logoTemp.innerHTML = `<img src=` + response.current_condition.icon_big + `>`
-            conditionAct = response.current_condition.condition
-            skyTint = conditionAct.substr(0, 4)
+            let conditionAct = response.current_condition.condition
+            let skyTint = conditionAct.substr(0, 4)
             $condition.innerHTML = conditionAct
             $cityChoose.value = "";
             writeTitle()
-            background()
-            nextHours(response)
+            background(skyTint)
+            nextHours(response,hourAct)
             nextDays(response)
-            infoSup(response)
-            
+            infoSup(response) 
             addFunctionNewFav()
             hideInfo()
         })

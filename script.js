@@ -1,48 +1,149 @@
 const $cityName = document.querySelector(".bold");
-const $logoTemp = document.querySelector(".logoTemp");
-const $tempAct = document.querySelector(".tempAct");
 const $cityChoose = document.querySelector(".cityChoose");
-const $condition = document.querySelector(".condition");
 const $body = document.querySelector("body");
-const $divHourByHour = document.querySelector(".hourByHour");
-const $divnextDays = document.querySelector(".nextDays");
 const $infoSup = document.querySelector(".sup-info");
-const $favoris = document.querySelector(".favoris");
-const $btnFav = document.querySelectorAll(".btn-fav");
-let city = "Paris"
 let favoris = [];
+const userInfo = {
+    city: "Paris",
+}
+function creationPage() {
+    userInfo.city = getCity()
+    let dataMeteo = "https://www.prevision-meteo.ch/services/json/" + userInfo.city;
+    fetch(dataMeteo)
+        .then(response => response.json())
+        .then(function (response) {  
+            let conditionAct = response.current_condition.condition
+            HTMLMainInfo(response,conditionAct)
+            HTMLTitle()
+            setBackground(conditionAct)
+            setHourByHour(response)
+            nextDays(response)
+            HTMLinfoSup(response)
+            addFunctionToNewFav()
+            hideInfo()
+            $cityChoose.value = "";
+        })
+        .catch(function () {
+            alert("Erreur")
+        })
+}
+function getCity() {
+    if ($cityChoose.value != "") {
+        return $cityChoose.value;
+    }else {
+        return  userInfo.city
+    }
+}
 
-const capitalize = (string) => {
+function HTMLMainInfo (response, conditionAct) {
+    document.querySelector(".tempAct").innerHTML = `${response.current_condition.tmp}°C`;
+    document.querySelector(".logoTemp").innerHTML = `<img src=${response.current_condition.icon_big}>`;
+    document.querySelector(".condition").innerHTML = conditionAct;
+}
+
+function HTMLTitle() {
+    let cityFav = compareCityToFavoris()
+    HTMLBtnFav(cityFav)
+}
+
+function compareCityToFavoris () {
+    let cityCompare = userInfo.city.toLowerCase()
+    for (favori of favoris) {
+        favori = favori.toLowerCase()
+        if (cityCompare == favori) {
+            return  "true";
+        }
+    }
+    return "false"
+}
+
+function HTMLBtnFav (cityFav) {
+    userInfo.city = capitalize(userInfo.city)
+    if (cityFav == "true") {
+        $cityName.innerHTML = `<span>${userInfo.city}</span> <img  class="fav btn-fav" onclick="removeFav()" title="Retirer des favoris" src="assets/img/delete.svg">`
+        document.querySelector(".btnNavFav").innerHTML = `<button class="btn my-2 my-lg-0 btn-addFav btn-fav" onclick="removeFav()">Retirer des favoris</button>`
+    } else {
+        $cityName.innerHTML = `<span>${userInfo.city}</span><img  class="fav btn-fav" onclick="addFav()" title="Ajouter aux favoris" src="assets/img/addFav.svg">`
+        document.querySelector(".btnNavFav").innerHTML = `<button class="btn my-2 my-lg-0 btn-addFav btn-fav" onclick="addFav()">Ajouter aux favoris</button>`
+    }
+}
+
+function capitalize(string) {
     if (typeof string !== 'string') return ''
     return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
-const writeTitle = function () {
-    let cityFav = "false";
-    let cityCompare = city.toLowerCase()
-    for (favori of favoris) {
-        favori = favori.toLowerCase()
-        if (cityCompare == favori) {
-            cityFav = "true";
-            break
-        }
-    }
-    city = capitalize(city)
-    if (cityFav == "true") {
-        $cityName.innerHTML = `<span>${city}</span> <img  class="fav btn-fav" onclick="removeFav()" title="Retirer des favoris" src="assets/img/delete.svg">`
-        document.querySelector(".btnNavFav").innerHTML= `<button class="btn my-2 my-lg-0 btn-addFav btn-fav" onclick="removeFav()">Retirer des favoris</button>`
+function setBackground(conditionAct) {
+    let skyTint = conditionAct.substr(0, 4)
+    if (skyTint == "Nuit") {
+        $body.classList.add("nuit");
+
     } else {
-        $cityName.innerHTML = `<span>${city}</span><img  class="fav btn-fav" onclick="addFav()" title="Ajouter aux favoris" src="assets/img/addFav.svg">`
-        document.querySelector(".btnNavFav").innerHTML= `<button class="btn my-2 my-lg-0 btn-addFav btn-fav" onclick="addFav()">Ajouter aux favoris</button>`
+        $body.classList.add("day")
     }
 }
 
-const displayFav = function () {
+function setHourByHour(response) {
+    let hourAct = response.current_condition.hour
+    let i = searchActHour(hourAct)
+    resetHTML(".hourByHour")
+    getWeatherHours(i,response)
+}
+
+function nextDays(response) {
+    resetHTML(".nextDays")
+    for (let i = 0; i < 5; i++) {
+        let futurDay = "fcst_day_" + i;
+        
+        HTMLForNextDays(response, futurDay, i);
+    }
+}
+
+function HTMLForNextDays(response, futurDay, i) {
+    let day = knowIfItsToday(response, futurDay, i)
+    const div = document.createElement('div');
+    div.className = "weather-next-days";
+    div.innerHTML = `<p>${day}</p> <p>${response[futurDay].tmin}/${response[futurDay].tmax}°C</p> <img src="${response[futurDay].icon}">`;
+    document.querySelector(".nextDays").appendChild(div);
+}
+
+function knowIfItsToday (response, futurDay, i) {
+    if (i == 0) {
+        return "Auj.";
+    }
+    return response[futurDay].day_short;
+}
+
+function HTMLinfoSup(response) {
+    document.querySelector(".humidity").innerHTML = "Le taux d'humidité est de : " + response.current_condition.humidity + "%";
+    document.querySelector(".windSpeed").innerHTML = "La vitesse du vent est de " + response.current_condition.wnd_spd + "km/h";
+    document.querySelector(".sunRise").innerHTML = "Le soleil se lévera à " + response.city_info.sunrise;
+    document.querySelector(".sunSet").innerHTML = "et se couchera à " + response.city_info.sunset;
+}
+
+function  hideInfo() {
+    $infoSup.classList.remove("active")
+    $infoSup.classList.add("sup-info_disable");
+    const $lineInfo = document.querySelectorAll(".lineInfo");
+    for (div of $lineInfo) {
+        div.classList.add("displayNone")
+    }
+}
+
+function addFunctionToNewFav() {
+    const $dropddownFav = document.querySelectorAll(".dropdown-item")
+    for (item of $dropddownFav) {
+        item.addEventListener("click", newPage)
+    }
+
+}
+
+function displayFav() {
     document.querySelector("#navbarDropdownMenuLink").classList.add("displayNone")
 }
 
-const writeFav = function () {
-    document.querySelector(".dropdown-menu").innerHTML = "";
+function HTMLFav() {
+    resetHTML(".dropdown-menu");
     let datFav = localStorage.getItem('datFav');
     if (datFav == "") {
         favoris = []
@@ -60,9 +161,20 @@ const writeFav = function () {
     }
 }
 
+function addFav() {
+    let cityAdd = getCityToAdd()
+    getStorage()
+    setCityToStorage(cityAdd)
+    HTMLTitle()
+    HTMLFav()
+    addFunctionToNewFav()
+}
 
-const addFav = function () {
-    let cityAdd = $cityName.textContent;
+function getCityToAdd() {
+    return $cityName.textContent;
+}
+
+function getStorage() {
     if (localStorage.length != 0) {
         let datFav = localStorage.getItem('datFav');
         if (datFav == "") {
@@ -70,63 +182,35 @@ const addFav = function () {
         } else {
             favoris = datFav.split(',');
         }
-
     }
+}
 
+function setCityToStorage(cityAdd) {
     const bAlreadyFavorite = favoris.indexOf(cityAdd) > -1;
-
     if (!bAlreadyFavorite && cityAdd != "") {
         favoris.push(cityAdd);
     }
-    localStorage.setItem('datFav', favoris)
-    document.querySelector(".dropdown-menu").innerHTML = "";
-    writeTitle()
-    writeFav()
-    addFunctionNewFav()
+    setFavToStorage()
+    resetHTML(".dropdown-menu")
 }
 
-const removeFav = function () {
-    let cityCompare = city.toLowerCase()
+function  removeFav() {
+    let cityCompare = userInfo.city.toLowerCase()
     for (favori of favoris) {
         let favoriCompare = favori.toLowerCase()
         if (cityCompare == favoriCompare) {
-            favoris.splice(favoris.indexOf(favori),1)
+            favoris.splice(favoris.indexOf(favori), 1)
+            setFavToStorage()
         }
     }
-    localStorage.setItem('datFav', favoris)
-    writeTitle()
-    writeFav()
-    addFunctionNewFav()
+    HTMLTitle()
+    HTMLFav()
+    addFunctionToNewFav()
 }
 
-
-const background = function (skyTint) {
-    if (skyTint == "Nuit") {
-        $body.style.backgroundImage = `url(./assets/img/blackSky.jpg)`
-
-    } else {
-        $body.style.backgroundImage = `url(./assets/img/1.jpg)`
-    }
-}
-
-const infoSup = function (response) {   
-    document.querySelector(".humidity").innerHTML = "Le taux d'humidité est de : " + response.current_condition.humidity + "%";
-    document.querySelector(".windSpeed").innerHTML = "La vitesse du vent est de " + response.current_condition.wnd_spd + "km/h";
-    document.querySelector(".sunRise").innerHTML = "Le soleil se lévera à " + response.city_info.sunrise;
-    document.querySelector(".sunSet").innerHTML = "et se couchera à " + response.city_info.sunset;
-}
-
-const divHour = function (pathHour, hourIcon, hourTemp) {
-    const div = document.createElement('div');
-    div.className = "weather-by-hour";
-    div.innerHTML = `<p>` + pathHour + `</p> <img src="` + hourIcon + `"><p>` + hourTemp + ` °C</p>`;
-    document.querySelector(".hourByHour").appendChild(div);
-}
-
-const nextHours = function (response ,hourAct ) {
+function searchActHour(hourAct) {
     let i = 0;
-    let iHour = "";
-
+    let iHour = "";                        // variable qui va prendre les différentes heures nous permettant de comparer à l'heure actuelle
     while (iHour != hourAct) {
         if (i < 10) {
             iHour = "0" + i + ":00";
@@ -135,53 +219,37 @@ const nextHours = function (response ,hourAct ) {
         }
         i += 1;
     }
+    return i
+}
 
-    $divHourByHour.innerHTML = "";
-    let DayForTheHours = "fcst_day_0" ;
-    for (let  j = 0; j < 24;i++,j++) {
+function getWeatherHours(i, response) {
+    
+    let DayForTheHours = "fcst_day_0";
+    for (let j = 0; j < 24; i++, j++) {
         if (i == 24) {
             i = 0;
-            DayForTheHours = "fcst_day_1"; 
+            DayForTheHours = "fcst_day_1";
         }
         const pathHour = i + "H00"
         const hourIcon = response[DayForTheHours].hourly_data[pathHour].ICON;
         const hourTemp = response[DayForTheHours].hourly_data[pathHour].TMP2m;
-        divHour(pathHour, hourIcon, hourTemp)
+        HTMLForEachHour(pathHour, hourIcon, hourTemp)
     }
 }
 
-const nextDays = function (response) {
-    $divnextDays.innerHTML = "";
-    for (let i = 0; i < 5; i++) {
-        let futurDay = "fcst_day_" + i;
-        let day = response[futurDay].day_short;
-        if (i == 0) {
-            day = "Auj."
-        }
-        let tmin = response[futurDay].tmin;
-        let tmax = response[futurDay].tmax;
-        let litleIcon = response[futurDay].icon;
-        const div = document.createElement('div');
-        div.className = "weather-next-days";
-        div.innerHTML = `<p>` + day + `</p> <p>` + tmin + ` / ` + tmax + `°C</p> <img src="` + litleIcon + `">`;
-        document.querySelector(".nextDays").appendChild(div);
-    }
+function HTMLForEachHour(pathHour, hourIcon, hourTemp) {
+    const div = document.createElement('div');
+    div.className = "weather-by-hour";
+    div.innerHTML = `<p>` + pathHour + `</p> <img src="` + hourIcon + `"><p>` + hourTemp + ` °C</p>`;
+    document.querySelector(".hourByHour").appendChild(div);
 }
 
-const newPage = function () {
-    city = event.target.textContent;
-    main()
+function newPage() {
+    userInfo.city = event.target.textContent;
+    creationPage()
 }
 
-const addFunctionNewFav = function () {
-    const $dropddownFav = document.querySelectorAll(".dropdown-item")
-    for (item of $dropddownFav) {
-        item.addEventListener("click", newPage)
-    }
-
-}
-
-const showInfo = function () {
+function showInfo() {
     $infoSup.classList.remove("sup-info_disable");
     const $lineInfo = document.querySelectorAll(".lineInfo");
     for (div of $lineInfo) {
@@ -190,45 +258,14 @@ const showInfo = function () {
     }
 }
 
-const hideInfo = function () {
-    $infoSup.classList.add("sup-info_disable");
-    const $lineInfo = document.querySelectorAll(".lineInfo");
-    for (div of $lineInfo) {
-        div.classList.add("displayNone")
-    }
+function resetHTML(place) {
+    document.querySelector(place).innerHTML = ""
 }
-
-function main() {
-    if ($cityChoose.value != "") {
-        city = $cityChoose.value;
-    }
-    let dataMeteo = "https://www.prevision-meteo.ch/services/json/" + city;
-    fetch(dataMeteo)
-        .then(response => response.json())
-        .then(function (response) {
-            $infoSup.classList.remove("active")
-            hourAct = response.current_condition.hour
-            $tempAct.innerHTML = `${response.current_condition.tmp}°C`
-            $logoTemp.innerHTML = `<img src=` + response.current_condition.icon_big + `>`
-            let conditionAct = response.current_condition.condition
-            let skyTint = conditionAct.substr(0, 4)
-            $condition.innerHTML = conditionAct
-            $cityChoose.value = "";
-            writeTitle()
-            background(skyTint)
-            nextHours(response,hourAct)
-            nextDays(response)
-            infoSup(response) 
-            addFunctionNewFav()
-            hideInfo()
-        })
-        .catch(function () {
-            alert("Erreur")
-        })
+function setFavToStorage(){
+    localStorage.setItem('datFav', favoris)
 }
-
-$cityChoose.addEventListener('change', main);
-
-main()
+document.querySelector('.sup-info').addEventListener('click', showInfo)
+$cityChoose.addEventListener('change', creationPage);
+creationPage()
 addFav()
 

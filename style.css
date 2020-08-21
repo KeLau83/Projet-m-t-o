@@ -5,6 +5,13 @@ background-position: center;
 min-height: 100vh;
 }
 
+.nuit {
+    background-image : url(./assets/img/blackSky.jpg);
+}
+
+.day {
+    background-image :url(./assets/img/1.jpg);
+}
 nav {
     margin-bottom: 60px;
 }

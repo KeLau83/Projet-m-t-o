@@ -124,7 +124,7 @@ function getHour(currentHour) {
     let hourFormat = "";                        // variable qui va prendre les différentes heures nous permettant de comparer à l'heure actuelle
     while (hourFormat != currentHour) {
         if (hourKey < 10) {
-            iHour = "0" + hourKey + ":00";
+            hourFormat = "0" + hourKey + ":00";
         } else if (hourKey >= 10) {
             hourFormat = hourKey + ":00";
         }

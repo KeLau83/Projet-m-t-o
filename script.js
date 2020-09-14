@@ -140,11 +140,16 @@ function getWeatherHours(i, dataWeather) {
             i = 0;
             DayForTheHours = "fcst_day_1";
         }
-        const pathHour = i + "H00"
-        const hourIcon = dataWeather[DayForTheHours].hourly_data[pathHour].ICON;
-        const hourTemp = dataWeather[DayForTheHours].hourly_data[pathHour].TMP2m;
+        let [pathHour, hourIcon, hourTemp] = getConstWeatherHour (DayForTheHours , i, dataWeather )
         HTMLForEachHour(pathHour, hourIcon, hourTemp)
     }
+}
+
+function getConstWeatherHour (DayForTheHours , i, dataWeather) {
+    const pathHour = i + "H00"
+    const hourIcon = dataWeather[DayForTheHours].hourly_data[pathHour].ICON;
+    const hourTemp = dataWeather[DayForTheHours].hourly_data[pathHour].TMP2m;
+    return [pathHour, hourIcon, hourTemp]
 }
 
 function HTMLForNextDays(dayWeather, i) {
